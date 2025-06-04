@@ -1,0 +1,33 @@
+version: "3"
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql5.7
+    restart: always
+    command: [
+      '--default-authentication-plugin=mysql_native_password',
+      '--character-set-server=utf8mb4',
+      '--collation-server=utf8mb4_general_ci',
+      '--explicit_defaults_for_timestamp=true',
+      '--lower_case_table_names=1'
+    ]
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_INITDB_SKIP_TZINFO: "Asia/Shanghai"
+      #MYSQL_DATABASE: data_sys
+    volumes:
+      #数据目录，要确保先创建好
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/logs:/var/log/mysql
+      ##初始化的脚本，初始化我们存放的init.sql文件
+      - ./mysql/initdb:/docker-install-entrypoint-initdb.d/
+      - ./mysql/conf:/etc/mysql/conf.d
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: mysqladmin ping -uroot -p${MYSQL_ROOT_PWD}
+      #test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p123456" ]
+      interval: 6s
+      timeout: 5s
+      retries: 10
+    #network_mode: host

@@ -1,0 +1,11 @@
+services:
+  app:
+    image: php83:v2
+    container_name: laravel_app
+    volumes:
+      - /Volumes/work/code/php/laravel:/var/www
+    working_dir: /var/www
+
+networks:
+  docker-utils-network:
+    external: true
