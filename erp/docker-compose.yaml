@@ -1,0 +1,28 @@
+services:
+  bgd_erp:
+    image: php82:v1
+    container_name: bgd_erp_app
+    volumes:
+      - /Volumes/work/code/php/bgd-erp/web:/var/www
+    working_dir: /var/www
+    networks:
+      - docker-utils-network
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: bgd_erp_nginx
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "8085:80"
+    volumes:
+      - /Volumes/work/code/php/bgd-erp/web:/var/www
+      - ./conf/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - bgd_erp
+    networks:
+      - docker-utils-network
+networks:
+  docker-utils-network:
+    external: true
