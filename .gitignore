@@ -1,2 +1,6 @@
 /nginx/logs/
 /redis/redis_data/
+/nginx/log/
+/mysql/8.0/mysql/data/
+/mysql/8.0/mysql/logs/
+/mes/logs/
