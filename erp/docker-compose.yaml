@@ -1,11 +1,11 @@
 services:
   fpm:
-    image: php82:v1
+    image: php82:v2
     container_name: bgd_app
     volumes:
       - /Volumes/work/code/php/bgd-erp/web:/var/www/erp
       - /Volumes/work/code/php/mes:/var/www/mes
-    working_dir: /var/www/erp
+    working_dir: /var/www
     networks:
       - docker-utils-network
 
