@@ -1,0 +1,37 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    command: [
+      '--default-authentication-plugin=mysql_native_password',
+      '--character-set-server=utf8mb4',
+      '--collation-server=utf8mb4_general_ci',
+      '--explicit_defaults_for_timestamp=true',
+      '--lower_case_table_names=1'
+    ]
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_INITDB_SKIP_TZINFO: "Asia/Shanghai"
+      # MYSQL_DATABASE: data_sys  # 可选，初始化时创建数据库
+    volumes:
+      # 持久化数据和日志目录，确保目录已创建
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/logs:/var/log/mysql
+      # 初始化脚本，存放你自己的 init.sql
+      - ./mysql/initdb:/docker-entrypoint-initdb.d/
+      # 自定义配置
+      - ./mysql/conf:/etc/mysql/conf.d
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - docker-utils-network
+
+networks:
+  docker-utils-network:
+    external: true
