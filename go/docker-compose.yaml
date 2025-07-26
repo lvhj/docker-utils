@@ -1,0 +1,14 @@
+services:
+  go_app:
+    image: registry.cn-hangzhou.aliyuncs.com/whatever233/go_app:v3
+    container_name: go_app
+#    working_dir: /var/www
+#    volumes:
+#        - ./bin/:/root/
+    ports:
+      - "9013:8080"
+    networks:
+      - docker-utils-network
+networks:
+  docker-utils-network:
+    external: true

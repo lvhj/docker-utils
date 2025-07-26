@@ -5,6 +5,7 @@ services:
     volumes:
       - /Volumes/work/code/php/bgd-erp/web:/var/www/erp
       - /Volumes/work/code/php/mes:/var/www/mes
+      - /Volumes/work/code/php/demo-mq:/var/www/demo-mq
     working_dir: /var/www
     networks:
       - docker-utils-network
@@ -17,9 +18,11 @@ services:
     ports:
       - "9011:80"
       - "9012:9012"
+      - "9013:9013"
     volumes:
       - /Volumes/work/code/php/bgd-erp/web:/var/www/erp
       - /Volumes/work/code/php/mes:/var/www/mes
+      - /Volumes/work/code/php/demo-mq:/var/www/demo-mq
       - ./conf:/etc/nginx/conf.d
       - ./logs/nginx:/var/log/nginx
     depends_on:

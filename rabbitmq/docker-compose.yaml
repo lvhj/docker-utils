@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   rabbitmq:
     image: rabbitmq:3-management   # 带 Web UI 的版本
@@ -11,6 +13,12 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq  # 持久化数据
     restart: always
+    networks:
+      - docker-utils-network
 
 volumes:
   rabbitmq_data:
+
+networks:
+  docker-utils-network:
+    external: true
