@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     libedit-dev \
     libcurl4-openssl-dev \
     pkg-config \
+    librabbitmq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         bcmath \
@@ -38,8 +39,8 @@ RUN apt-get update && apt-get install -y \
         opcache \
         mysqli \
         sockets \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
+    && pecl install redis amqp \
+    && docker-php-ext-enable redis amqp \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 安装 Composer
@@ -48,5 +49,5 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # 设置工作目录
 WORKDIR /var/www
 
-# 推荐设置时区
+# 设置时区
 ENV TZ=Asia/Shanghai

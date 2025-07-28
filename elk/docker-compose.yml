@@ -1,0 +1,111 @@
+version: "3"
+services:
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.3
+    labels:
+      co.elastic.logs/enabled: "false"
+    hostname: docker-install-es
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - ELASTIC_PASSWORD=elastic
+      - KIBANA_PASSWORD=elastic
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+
+#  enterprise-search:
+#    image: docker.elastic.co/enterprise-search/enterprise-search:8.4.3
+#    hostname: docker-install-enterprise-search
+#    ports:
+#      - "3002:3002"
+#    environment:
+#      - elasticsearch.host=http://docker-es:9200
+#      - elasticsearch.username=elastic
+#      - elasticsearch.password=elastic
+#      - ent_search.auth.source=standard
+#      - secret_management.encryption_keys=["a_random_encryption_key"]
+#      - allow_es_settings_modification=true
+#      - TZ=Asia/Shanghai
+#    volumes:
+#      - ./enterprise-search:/usr/share/enterprise-search/config
+#    depends_on:
+#      - es
+#      -
+  enterprisesearch:
+    hostname: docker-enterprise-search
+    depends_on:
+      - es
+      - kibana
+    image: docker.elastic.co/enterprise-search/enterprise-search:8.4.3
+    ports:
+      - 3002:3002
+    environment:
+      - SERVERNAME=enterprisesearch
+      - allow_es_settings_modification=true
+      - secret_management.encryption_keys=["f3d17fd990a05bbb72b076bdae8088c9f8fd53ad1e84ec5a63c742eaa63ba0ec"]
+      - elasticsearch.host=http://docker-install-es:9200
+      - elasticsearch.username=elastic
+      - elasticsearch.password=elastic
+      - elasticsearch.ssl.enabled=false
+      - kibana.external_url=http://docker-install-kibana:5601
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:3002 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.4.3
+    labels:
+      co.elastic.logs/enabled: "false"
+    hostname: docker-install-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://docker-install-es:9200
+      - ELASTICSEARCH_PASSWORD=elastic
+      - KIBANA_PASSWORD=elastic
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    depends_on:
+      - es
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.4.3
+    hostname: docker-install-logstash
+    labels:
+      co.elastic.logs/enabled: "false"
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    volumes:
+      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./data/logs:/logs
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "LS_OPTS=--config.reload.automatic"
+    depends_on:
+      - es
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.4.3
+    labels:
+      co.elastic.logs/enabled: "false"
+    user: root
+    hostname: docker-install-filebeat
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - "/var/lib/docker-install/containers:/var/lib/docker-install/containers:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    depends_on:
+      - es

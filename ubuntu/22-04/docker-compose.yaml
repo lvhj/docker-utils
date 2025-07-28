@@ -1,0 +1,12 @@
+services:
+  node:
+    image: ubuntu:22.04
+    container_name: ubuntu_node
+    networks:
+      - my-network
+    command: ["sleep", "7200"]
+    restart: always
+
+networks:
+  my-network:
+    driver: bridge  # 使用 bridge 网络模式

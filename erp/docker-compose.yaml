@@ -1,6 +1,6 @@
 services:
   fpm:
-    image: php82:v2
+    image: php82:v3
     container_name: bgd_app
     volumes:
       - /Volumes/work/code/php/bgd-erp/web:/var/www/erp

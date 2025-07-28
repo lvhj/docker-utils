@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  portainerce:
+    image: portainer/portainer-ce:2.25.1
+    container_name: portainerce
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Shanghai"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer-data:/data
+    ports:
+      - 9001:9000
+    command: -H unix:///var/run/docker.sock
