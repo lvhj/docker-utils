@@ -5,6 +5,10 @@ services:
     image: jenkins/jenkins:2.516.1-lts-jdk21
     container_name: jenkins
     restart: unless-stopped
+    environment:
+      - HTTP_PROXY=http://host.docker.internal:7890
+      - HTTPS_PROXY=http://host.docker.internal:7890
+      - NO_PROXY=localhost,127.0.0.1,host.docker.internal
     ports:
       - "9002:8080"   # Jenkins Web UI
       - "50000:50000" # Agent 连接端口
