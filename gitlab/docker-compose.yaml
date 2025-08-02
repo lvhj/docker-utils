@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: always
+    hostname: 'gitlab.example.com'  # 你自己的域名或主机名
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.example.com'
+        # 你可以在这里添加其他 GitLab 配置项
+    ports:
+      - "80:80"     # HTTP 访问端口
+      - "443:443"   # HTTPS 访问端口（如果你配置了SSL）
+      - "22:22"     # SSH 端口，用于 git clone ssh
+    volumes:
+      - ./gitlab-config:/etc/gitlab
+      - ./gitlab-logs:/var/log/gitlab
+      - ./gitlab-data:/var/opt/gitlab
+    networks:
+      - docker-utils-network
+
+networks:
+  docker-utils-network:
+    external: true
